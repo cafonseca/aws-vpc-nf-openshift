@@ -1,0 +1,76 @@
+additionalTrustBundlePolicy: Proxyonly
+apiVersion: v1
+baseDomain: <a valid hosted zone in your AWS account>
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform:
+    aws:
+      rootVolume:
+        iops: 2000
+        size: 500
+        type: io1 
+      type: c5.4xlarge
+      zones:
+      - us-east-2a
+      - us-east-2b
+      - us-east-2c
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform:
+    aws:
+      zones:
+      - us-east-2a
+      - us-east-2b
+      - us-east-2c
+      rootVolume:
+        iops: 4000
+        size: 500
+        type: io1      
+      type: m6i.xlarge
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: controlplane-02
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.101.0/24 # public subnet
+  - cidr: 10.0.102.0/24 # public subnet
+  - cidr: 10.0.103.0/24 # public subnet
+  - cidr: 10.0.1.0/24 # private subnet
+  - cidr: 10.0.2.0/24 # private subnet
+  - cidr: 10.0.3.0/24 # private subnet
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+capabilities:
+  baselineCapabilitySet: v4.12
+  additionalEnabledCapabilities:
+  - openshift-samples
+  - marketplace
+  - Console
+  - Insights
+  - Storage
+  - CSISnapshot
+platform:
+  aws:
+    region: us-east-2
+    lbType: NLB
+    propagateUserTags: true 
+    userTags:
+      owner: cafonseca@us.ibm.com
+    subnets:
+    - subnet-0d54e98829f85c91f # public subnet ID
+    - subnet-09a26717264f1ccd0 # public subnet ID
+    - subnet-0cc0c458c8292f257 # public subnet ID
+    - subnet-08a74937c36471ec3 # private subnet ID
+    - subnet-0d63113b79f7e9798 # private subnet ID
+    - subnet-0fc341fde2040eddd # private subnet ID
+publish: External
